@@ -4,6 +4,9 @@ from bson.objectid import ObjectId
 import datetime
 import schedule
 import os
+import Users as user
+import Doctor as doc
+import patient as pat
 
 from twilio import Client
 account_sid = 'AC2e9e80653029925585ee52b3ef7c72c8'
@@ -108,63 +111,10 @@ def medications():
         while True:
             schedule.run_pending()
             time.sleep(1)
-# Connect to MongoDB
-client = MongoClient('mongodb://localhost:27017')
-db = client['admin']
-users_collection = db['Users']
 
-def sign_up():
-    Name = input("Enter your name: ")
-    Age = int(input("Enter your age: "))
-    while Age < 0:
-        print("Invalid age")
-        Age = int(input("Enter your age: "))
-    Height = float(input("Enter your height: "))
-    Weight = float(input("Enter your weight: "))
-    Phone = input("Enter your phone number: ")
-    Email = input("Enter your email: ")
-    while '@' not in Email:
-        print("Invalid email")
-        Email = input("Enter your email: ")
-    Password = input("Enter your password: ")
-    while len(Password) < 12:
-        print("Password must be at least 12 characters long")
-        Password = input("Enter your password: ")
-    Password2 = input("Confirm your password: ")
-    while Password != Password2:
-        print("Passwords do not match")
-        Password2 = input("Confirm your password: ")
-    TD = int(input("Enter your type of diabetes (1 or 2): "))
-    while TD != 1 and TD != 2:
-        print("Invalid type of diabetes")
-        TD = int(input("Enter your type of diabetes (1 or 2): "))
-    Medic = input("Enter your medication you are taking: ")
-
-    user_data = {
-        'name': Name,
-        'age': Age,
-        'height': Height,
-        'weight': Weight,
-        'phone': Phone,
-        'email': Email,
-        'password': Password,
-        'td': TD,
-        'medic': Medic
-    }
-    users_collection.insert_one(user_data)
-    print("You have successfully signed up!")
-
-def sign_in():
-    Email = input("Enter your email: ")
-    Password = input("Enter your password: ")
-
-    # Find user by email and password
-    user_data = users_collection.find_one({'email': Email, 'password': Password})
-
-    if user_data:
-        print("Welcome, " + user_data['name'] + "! You have successfully signed in.")
-    else:
-        print("Invalid email or password. Please retry.")
+def message():
+    medications()
+    
 
 def main():
     choice = 0
@@ -177,12 +127,14 @@ def main():
             print("Invalid choice. Please retry.")
             choice = input("Enter your choice (1/2/3): ")
         if choice == 1:
-            sign_up()
+            user.sign_up()
         elif choice == 2:
-            sign_in()
+            choose = 0
+            print("Welcome to the sign in page!")
+            user.sign_in()
         else:
             continue
-
+client.close()
 if __name__ == "__main__":
     main()
 

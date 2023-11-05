@@ -11,6 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>Health project</Name>
     <RootNamespace>Health project</RootNamespace>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +23,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Health_project.py" />
-    <Compile Include="Database.py">
+    <Compile Include="Doctor.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="patient.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Users.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
