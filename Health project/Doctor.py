@@ -54,7 +54,7 @@ def moreinfo():
         'id': num,
         'fname': fname,
         'lname': lname,
-        'phone': phone,
+        'phone': '+1' + phone,
         'type': typ,
         'medication': medic,
         'dosage': dose,
@@ -62,6 +62,17 @@ def moreinfo():
     patient_data.insert_one(patient)
     print(f"Patient {fname} {lname}, id: {num}, has been updated successfully!")
     
+def get_id():
+    ide = int(input("Enter patient's ID: "))
+    while (patient_data.find_one({'id': ide}) == None):
+        print("Patient not found. Please retry.")
+        ide = int(input("Enter patient's ID: "))
+    return ide
+
+def get_dosage(ide):
+    for patient in patient_data.find({'id': ide}):
+        return patient['dosage']
+
 def type1():
     print("Patients who have diabete type 1: \n")
     for patient in patient_data.find({'type': 'type 1'}):
@@ -70,6 +81,7 @@ def type1():
         print(f"Phone number: {patient['phone']}")
         print(f"Medication: {patient['medication']}")
         print(f"Dosage: {patient['dosage']}")
+        print("-----------------------------------")
         
 def type2():
     print("Patients who have diabete type 2: \n")
@@ -79,6 +91,7 @@ def type2():
         print(f"Phone number: {patient['phone']}")
         print(f"Medication: {patient['medication']}")
         print(f"Dosage: {patient['dosage']}")
+        print("-----------------------------------")
     
 
 def Doctor():

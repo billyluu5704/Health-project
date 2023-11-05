@@ -4,21 +4,23 @@ from bson.objectid import ObjectId
 import datetime
 import schedule
 import os
+import time
 import Users as user
 import Doctor as doc
 import patient as pat
-
-from twilio import Client
+client = MongoClient('mongodb://localhost:27017')
+db = client['admin']
+patient_data = db['patient info']
+users_collection = db['Users']
+from twilio.rest import Client
 account_sid = 'AC2e9e80653029925585ee52b3ef7c72c8'
 auth_token = 'd7b57a65fc3b5576c050171782de0359'
 client = Client(account_sid, auth_token)
 
-message = client.messages \
-                .create(
-                     body="Join Earth's mightiest heroes. Like Kevin Bacon.",
-                     from_='+15017122661',
-                     to='+15558675310'
-                 )
+items = patient_data.find({})
+
+
+
 current_date_and_time = datetime.datetime.now()
 current_hour = current_date_and_time.hour
 current_day = current_date_and_time.weekday()
@@ -33,90 +35,111 @@ count_whole_day_message = 0
 
 
 def doctors_appointment():
-    #Twilio api call)
-    rewards_for_patients(5)
-def rewards_for_patients(rewards):
-    #Twilio API Call to recieve a message saying yes
-    if msg == "Yes":
-        total_rewards += rewards
-        if total_rewards >= 18:
-            if reward_type == "Kroger":
-                #Twilio API Call to send them Kroger Voucher card
-                True
-            else:
-                True
-                #Twilio API Call to send them Metro Gift Voucher
-            
-    
+    for item in items:
+        dosage = item["dosage"]
+        patient_number = item["phone"]
+        doctors_appointment_message = client.messages \
+        .create(
+             body="It's been 3 months since your last visit to the doctor and they miss you! Schedule an appointment with them at the link below: . Additionally reply yes to be entered to win extra reward points",
+             from_='+18447260269',
+             to=patient_number
+         )
 
 
 def medications():
-    if user.medic == 'i':
-        if current_hour <= 8:
-            count_breaksfast_message += 1
-            if count_breakfast_message == 1:
-                schedule.every().day.at("8:00").do(#twilio api call)
-                rewards_for_patients(1)
-        elif current_hour <= 12:
-            count_lunch_message += 1
-            if count_lunch message == 1:
-                schedule.every().day.at("12:00").do(#twilio api call)
-                rewards_for_patients(1)
-        elif current_hour <= 18:
-            count_dinner_message += 1
-            if count_dinner_message == 1:
-                schedule.every().day.at("18:00").do(#twilio api call)
-                rewards_for_patients(1)
-        elif current_hour <= 20:
-            count_whole_day_message += 1
-            if count_whole_day_message == 1:
-                schedule.every().day.at("20:00").do(#twilio api call)
-                rewards_for_patients(1)
-    elif user.medic == 'm':
-        if current_hour <=18:
-            count_dinner_message += 1
-            user.dosage = 500
-            if count_dinner_message == 1:
-                schedule.every().day.at("18:00").do(#twilio api call for dosage amount)
-                rewards_for_patients(1)
-    elif user.medic == 's':
-        if current_hour <= 12:
-            count_lunch_message += 1
-            if count_lunch_message == 1:
-                schedule.every().day.at("12:00").do(#twilio api call)
-                rewards_for_patients(1)
-        if current_hour <=18:
-            count_dinner_message += 1
-            if count_dinner_message == 1:
-                schedule.every().day.at("18:00").do(#twilio api call)
-                rewards_for_patients(1)
-    elif user.medic == 'd':
-        user.dosage = 2.5
-        if current_hour <=18:
-            count_dinner_message += 1
-            if count_dinner_message == 1:
-                schedule.every().day.at("18:00").do(#twilio api call)
-                rewards_for_patients(1)
-    elif user.medic == 'SGLD2':
-        user.dosage = 0.025
-        if current_hour <=18:
-            count_dinner_message += 1
-            if count_dinner_message == 1:
-                schedule.every().day.at("18:00").do(#twilio api call)
-                rewards_for_patients(1)
-    elif user.medic == 'g':
-        user.dosage = 0.00075
-        schedule.every().friday.at("18:00").do(#twilio api call)
-        rewards_for_patients(1)
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
+    for item in items:
+        dosage = item["dosage"]
+        patient_number = item["phone"]
+        morning_message = client.messages \
+    .create(
+         body="Good Morning! Don't forget to take your meds for the day! The dosage required for today is " + user.dosage + ".",
+         from_='+18447260269',
+         to=patient_number
+    )
 
-def message():
-    medications()
-    
+
+        afternoon_message = client.messages \
+    .create(
+         body='Howdy! Hope our day has been great so far. Dont forget to take your meds for the day! The dosage required is ' + dosage + '.',
+         from_='+18447260269',
+         to=patient_number
+     )
+
+        evening_message = client.messages \
+    .create(
+         body='Cheers! The day is finally over. But dont forget to take your meds for the day! The dosage required is ' + dosage + '.',
+         from_='+18447260269',
+         to=patient_number
+     )
+
+        night_message = client.messages \
+    .create(
+         body='Time to retire for the day and go to bed! But dont forget to take your meds for the day! The dosage required is ' + dosage + '.',
+         from_='+18447260269',
+         to=patient_number
+     )
+
+
+
+        if user.medic == 'Insulin':
+            if current_hour <= 8:
+                count_breaksfast_message += 1
+                if count_breakfast_message == 1:
+                    schedule.every().day.at("8:00").do(morning_message)
+            elif current_hour <= 12:
+                count_lunch_message += 1
+                if count_lunch_message == 1:
+                    schedule.every().day.at("12:00").do(afternoon_message)
+            elif current_hour <= 18:
+                count_dinner_message += 1
+                if count_dinner_message == 1:
+                    schedule.every().day.at("18:00").do(evening_message)
+            elif current_hour <= 20:
+                count_whole_day_message += 1
+                if count_whole_day_message == 1:
+                    schedule.every().day.at("20:00").do(night_message)
+        elif user.medic == 'Metformine':
+            if current_hour <=18:
+                count_dinner_message += 1
+                user.dosage = 500
+                if count_dinner_message == 1:
+                    schedule.every().day.at("18:00").do(evening_message)
+        elif user.medic == 's':
+            if current_hour <= 12:
+                count_lunch_message += 1
+                if count_lunch_message == 1:
+                    schedule.every().day.at("12:00").do(afternoon_message)
+            if current_hour <=18:
+                count_dinner_message += 1
+                if count_dinner_message == 1:
+                    schedule.every().day.at("18:00").do(evening_message)
+        elif user.medic == 'd':
+            user.dosage = 2.5
+            if current_hour <=18:
+                count_dinner_message += 1
+                if count_dinner_message == 1:
+                    schedule.every().day.at("18:00").do(evening_message)
+        elif user.medic == 'SGLD2':
+            user.dosage = 0.025
+            if current_hour <=18:
+                count_dinner_message += 1
+                if count_dinner_message == 1:
+                    schedule.every().day.at("18:00").do(evening_message)
+        elif user.medic == 'g':
+            user.dosage = 0.00075
+            schedule.every().friday.at("18:00").do(evening_message)
+            while True:
+                schedule.run_pending()
+                time.sleep(1)
+
 
 def main():
+    medications()
+    doctors_appointment()
+
+    
+    
+
     choice = 0
     while (choice != 3):
         print("1. Sign Up")
@@ -134,7 +157,7 @@ def main():
             user.sign_in()
         else:
             continue
-client.close()
+
 if __name__ == "__main__":
     main()
 

@@ -34,7 +34,7 @@ def sign_up():
     user_data = {
         'fname': FName,
         'lname': LName,
-        'phone': Phone,
+        'phone': '+1' + Phone,
         'position': Position,
         'email': Email,
         'password': Password,
@@ -46,21 +46,17 @@ def sign_in():
     Email = input("Enter your email: ")
     Password = input("Enter your password: ")
     # Find user by email and password
-    email = users_collection.find_one({'email': Email})
-    fname = users_collection.get('fname')
-    lname = users_collection.get('lname')
-    password = users_collection.find_one({'password': Password})
+    check = users_collection.find_one({'email': Email, 'password': Password})
     # Check if user exists (i.e., if user_data is not None)
-    while (Email != email and Password != password):
+    while (check is None):
         print("Invalid email or password")
         Email = input("Enter your email: ")
         Password = input("Enter your password: ")
-        email = users_collection.find_one({'email': Email})
-        password = users_collection.find_one({'password': Password})
+        check = users_collection.find_one({'email': Email, 'password': Password})
     print("You have successfully signed in!")
-    if users_collection.get('position') == 'Patient':
+    if check.get('position') == 'Patient':
         pat.Patient()
-    elif users_collection.get('position') == 'Doctor':
+    elif check.get('position') == 'Doctor':
         doc.Doctor()
     else:
         print("Invalid position")
